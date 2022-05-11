@@ -5,11 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/morkid/paginate"
 
 	token_auth "foodr/Authentication/Controller"
+	recipe "foodr/Recipe"
 	recipe_model "foodr/Recipe/Models"
 	"foodr/configuration"
-	"foodr/recipe"
 	user_model "foodr/user/models"
 )
 
@@ -80,5 +81,26 @@ func GetRecipe(c *gin.Context) {
 		return
 	}
 
+	// configuration.DB.First(&recipeDTO, "id = ?", c.Param("id"))
+
 	c.JSON(http.StatusOK, gin.H{"item": recipeDTO})
+}
+
+func GetAllRecipeFromUser(c *gin.Context) {
+	var recipeDTO []*recipe_model.RecipeDTO
+	pg := paginate.New()
+
+	// model := db.
+	// 	Where("recipe_dtos.owner_id = ?", c.Param("id")).
+	// 	Preload("Owner").
+	// 	Find(&recipeDTO)
+
+	// model := configuration.DB.Where("recipe_dtos.owner_id = ?", c.Param("id"))
+	model := configuration.DB.
+		Where("recipe_dtos.owner_id = ?", c.Param("id")).
+		Joins("JOIN user_dtos on recipe_dtos.owner_id=user_dtos.id::text").
+		Preload("Owner").
+		Find(&recipeDTO)
+
+	c.JSON(http.StatusOK, pg.With(model).Request(c.Request).Response(&recipeDTO))
 }

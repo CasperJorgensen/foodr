@@ -36,6 +36,7 @@ func main() {
 	router.GET("/users", user_controller.GetAllUsers)
 	router.POST("/users", user_controller.CreateUser)
 	router.POST("/users/login", user_controller.Login)
+	router.GET("/users/:id/recipes", recipe_controller.GetAllRecipeFromUser)
 
 	router.POST("/recipe", recipe_controller.CreateRecipe)
 	router.GET("/recipe/:id", recipe_controller.GetRecipe)
